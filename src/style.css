@@ -1,10 +1,62 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
 
+/* ===== PrimeVue CSS Variable Aliases =====
+   PrimeVue 4 generates variables with --p- prefix.
+   These aliases allow using shorthand names throughout the app. */
+:root {
+  /* Text */
+  --text-color: var(--p-text-color);
+  --text-color-secondary: var(--p-text-color-secondary);
+  /* Surface */
+  --surface-0: var(--p-surface-0);
+  --surface-50: var(--p-surface-50);
+  --surface-100: var(--p-surface-100);
+  --surface-200: var(--p-surface-200);
+  --surface-300: var(--p-surface-300);
+  --surface-400: var(--p-surface-400);
+  --surface-500: var(--p-surface-500);
+  --surface-600: var(--p-surface-600);
+  --surface-700: var(--p-surface-700);
+  --surface-800: var(--p-surface-800);
+  --surface-900: var(--p-surface-900);
+  --surface-950: var(--p-surface-950);
+  --surface-card: var(--p-surface-card);
+  --surface-border: var(--p-surface-border);
+  --surface-ground: var(--p-surface-ground);
+  --surface-hover: var(--p-surface-hover);
+  --surface-section: var(--p-surface-section);
+  --surface-overlay: var(--p-surface-overlay);
+  /* Primary */
+  --primary-color: var(--p-primary-color);
+  --primary-color-text: var(--p-primary-color-text);
+  --primary-50: var(--p-primary-50);
+  --primary-100: var(--p-primary-100);
+  --primary-200: var(--p-primary-200);
+  --primary-300: var(--p-primary-300);
+  --primary-400: var(--p-primary-400);
+  --primary-500: var(--p-primary-500);
+  --primary-600: var(--p-primary-600);
+  --primary-700: var(--p-primary-700);
+  --primary-800: var(--p-primary-800);
+  --primary-900: var(--p-primary-900);
+  --primary-950: var(--p-primary-950);
+  /* Content / Form */
+  --primary-color-opacity: color-mix(in srgb, var(--p-primary-color) 20%, transparent);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
@@ -13,130 +65,104 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--p-text-color);
+  background-color: var(--p-surface-ground);
 }
 
 #app {
   width: 100%;
   min-height: 100vh;
+  color: var(--text-color);
+  background-color: var(--surface-ground);
 }
 
 /* PrimeVue Button Customization */
-:deep(.p-button) {
+.p-button {
   border-radius: 0.375rem;
   font-weight: 600;
   transition: all 0.3s ease;
 }
 
-:deep(.p-button:hover) {
+.p-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-:deep(.p-button.p-button-lg) {
+.p-button.p-button-lg {
   padding: 1rem 2rem;
   font-size: 1rem;
 }
 
 /* PrimeVue Card Customization */
-:deep(.p-card) {
+.p-card {
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: none;
 }
 
-:deep(.p-card .p-card-content) {
+.p-card .p-card-content {
   padding: 1.5rem;
 }
 
-/* Doctor Schedule Card */
-:deep(.doctor-schedule-card .p-card-content) {
-  background: var(--primary-color);
-  color: var(--primary-color-text);
-}
-
-:deep(.doctor-schedule-card .p-card-content h2) {
-  color: var(--primary-color-text);
-}
-
-:deep(.doctor-schedule-card .p-card-content p),
-:deep(.doctor-schedule-card .p-card-content div) {
-  color: var(--primary-color-text);
-}
-
-/* No Doctor Card */
-:deep(.no-doctor-card .p-card-content) {
-  background: var(--surface-400);
-  color: var(--surface-0);
-}
-
-:deep(.no-doctor-card .p-card-content h2) {
-  color: var(--surface-0);
-}
-
-:deep(.no-doctor-card .p-card-content p),
-:deep(.no-doctor-card .p-card-content div) {
-  color: var(--surface-0);
-}
-
 /* PrimeVue Dialog Customization */
-:deep(.p-dialog) {
+.p-dialog {
   border-radius: 0.5rem;
 }
 
-:deep(.p-dialog .p-dialog-header) {
+.p-dialog .p-dialog-header {
   border-bottom: 1px solid var(--surface-border);
   padding: 1.5rem;
 }
 
-:deep(.p-dialog .p-dialog-content) {
+.p-dialog .p-dialog-content {
   padding: 1.5rem;
 }
 
 /* PrimeVue Toolbar Customization */
-:deep(.p-toolbar) {
+.p-toolbar {
   background-color: var(--surface-0);
   border-bottom: 1px solid var(--surface-border);
   padding: 1rem 2rem;
 }
 
-:deep(.p-toolbar-group-start) {
+.p-toolbar-group-start {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-:deep(.p-toolbar-group-end) {
+.p-toolbar-group-end {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
 /* PrimeVue Rating Customization */
-:deep(.p-rating) {
+.p-rating {
   gap: 0.25rem;
 }
 
-:deep(.p-rating .p-icon) {
+.p-rating .p-icon {
   font-size: 1rem;
 }
 
 /* PrimeVue Tag Customization */
-:deep(.p-tag) {
+.p-tag {
   font-size: 0.875rem;
   font-weight: 600;
 }
 
 /* PrimeVue Carousel Customization */
-:deep(.p-carousel) {
+.p-carousel {
   width: 100%;
 }
 
-:deep(.p-carousel .p-carousel-content) {
+.p-carousel .p-carousel-content {
   padding: 0;
 }
 
-:deep(.p-carousel-prev),
-:deep(.p-carousel-next) {
+.p-carousel-prev,
+.p-carousel-next {
   width: 40px;
   height: 40px;
   background-color: var(--surface-0);
@@ -144,40 +170,40 @@ body {
   border-radius: 50%;
 }
 
-:deep(.p-carousel-prev:hover),
-:deep(.p-carousel-next:hover) {
+.p-carousel-prev:hover,
+.p-carousel-next:hover {
   background-color: var(--surface-0);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* Input Text Customization */
-:deep(.p-inputtext) {
+.p-inputtext {
   border-radius: 0.375rem;
   border: 1px solid var(--surface-border);
   padding: 0.75rem;
   font-size: 1rem;
 }
 
-:deep(.p-inputtext:focus) {
+.p-inputtext:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px var(--primary-color-opacity);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  :deep(.p-toolbar) {
+  .p-toolbar {
     padding: 0.75rem 1rem;
     flex-direction: column;
     gap: 1rem;
   }
 
-  :deep(.p-toolbar-group-start),
-  :deep(.p-toolbar-group-end) {
+  .p-toolbar-group-start,
+  .p-toolbar-group-end {
     width: 100%;
     justify-content: center;
   }
 
-  :deep(.p-button.p-button-lg) {
+  .p-button.p-button-lg {
     width: 100%;
   }
 }

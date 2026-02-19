@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@primeuix/themes": "^2.0.3",
+    "@primevue/forms": "^4.5.4",
     "@tailwindcss/vite": "^4.1.18",
     "daisyui": "^5.5.18",
     "pinia": "^3.0.4",
@@ -17,7 +18,8 @@
     "primevue": "^4.5.4",
     "tailwindcss": "^4.1.18",
     "vue": "^3.5.24",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

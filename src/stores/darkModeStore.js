@@ -21,8 +21,10 @@ export const useDarkModeStore = defineStore('darkMode', () => {
     const html = document.documentElement
     if (isDarkMode.value) {
       html.classList.add('dark')
+      html.style.colorScheme = 'dark'
     } else {
       html.classList.remove('dark')
+      html.style.colorScheme = 'light'
     }
   }
 
