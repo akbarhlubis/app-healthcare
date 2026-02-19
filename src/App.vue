@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
+import AppFooter from './components/layout/AppFooter.vue'
 import { useAuthStore } from './stores/authStore'
 import { useDarkModeStore } from './stores/darkModeStore'
 
@@ -40,6 +41,7 @@ onMounted(() => {
 
     <main class="page-content">
       <RouterView />
+      <AppFooter />
     </main>
 
     <!-- Login Dialog -->

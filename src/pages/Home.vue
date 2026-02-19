@@ -433,25 +433,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- ===== FOOTER INFO ===== -->
-      <div class="section-block" id="footer-info">
-        <Card>
-          <template #content>
-            <div style="text-align: center;">
-              <img :src="hospitallLogo" style="height: 3rem; width: auto; margin-bottom: 0.75rem;" alt="Logo" />
-              <p style="font-weight: 700; font-size: 1rem; margin: 0 0 0.25rem;">{{ hospitalName }}</p>
-              <p style="font-size: 0.8rem; margin: 0.25rem 0; color: var(--text-color-secondary);">📍 {{ hospitalAddress }}</p>
-              <p style="font-size: 0.8rem; margin: 0.25rem 0; color: var(--text-color-secondary);">📞 {{ hospitalPhone }}</p>
-              <p style="font-size: 0.8rem; margin: 0.25rem 0; color: var(--text-color-secondary);">📧 {{ hospitalEmail }}</p>
-              <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--surface-border);">
-              <p style="font-size: 0.7rem; color: var(--text-color-secondary); margin: 0;">
-                © 2026 {{ appName }} — Pelayanan Kesehatan Terpadu
-              </p>
-            </div>
-          </template>
-        </Card>
-      </div>
-
     </div>
 
     <!-- ===== FLOATING ACTION BUTTON ===== -->
