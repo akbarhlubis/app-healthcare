@@ -231,20 +231,37 @@ onUnmounted(() => {
           <Avatar 
             size="large" 
             shape="circle"
-            style="border: 2px solid var(--surface-border); cursor: pointer;"
+            style="border: 2px solid rgba(255,255,255,0.3); cursor: pointer;"
             @click="authStore.isLoggedIn ? null : authStore.openLoginModal()"
           />
         </div>
         
-        <!-- Search Bar -->
-        <!-- <div class="hero-search">
-          <span class="pi pi-search" style="color: var(--text-color-secondary);"></span>
-          <InputText 
-            placeholder="Cari layanan kesehatan..."
-            style="width: 100%; border: none; box-shadow: none; background: transparent;"
-            readonly
-          />
-        </div> -->
+        <!-- Info Bar inside Hero -->
+        <div class="hero-info-bar">
+          <div class="hero-info-item">
+            <i class="pi pi-clock"></i>
+            <div>
+              <p class="hero-info-label">Waktu</p>
+              <p class="hero-info-value">{{ formatTime() }} WIB</p>
+            </div>
+          </div>
+          <div class="hero-info-divider"></div>
+          <div class="hero-info-item">
+            <i class="pi pi-users"></i>
+            <div>
+              <p class="hero-info-label">Dokter Aktif</p>
+              <p class="hero-info-value">{{ doctorStore.todayDoctors.length }} Dokter</p>
+            </div>
+          </div>
+          <div class="hero-info-divider"></div>
+          <div class="hero-info-item">
+            <i class="pi pi-check-circle" style="color: #34D399;"></i>
+            <div>
+              <p class="hero-info-label">Status</p>
+              <p class="hero-info-value" style="color: #34D399;">Buka</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ===== PROMO / ANNOUNCEMENT CAROUSEL ===== -->
@@ -416,39 +433,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- ===== CLOCK & INFO BAR ===== -->
-      <div class="section-block">
-        <Card>
-          <template #content>
-            <div class="info-bar">
-              <div class="info-bar-item">
-                <i class="pi pi-clock" style="font-size: 1.25rem; color: var(--primary-color);"></i>
-                <div>
-                  <p class="info-bar-label">Waktu</p>
-                  <p class="info-bar-value">{{ formatTime() }} WIB</p>
-                </div>
-              </div>
-              <div class="info-bar-divider"></div>
-              <div class="info-bar-item">
-                <i class="pi pi-users" style="font-size: 1.25rem; color: var(--primary-color);"></i>
-                <div>
-                  <p class="info-bar-label">Dokter Aktif</p>
-                  <p class="info-bar-value">{{ doctorStore.todayDoctors.length }} Dokter</p>
-                </div>
-              </div>
-              <div class="info-bar-divider"></div>
-              <div class="info-bar-item">
-                <i class="pi pi-check-circle" style="font-size: 1.25rem; color: #10B981;"></i>
-                <div>
-                  <p class="info-bar-label">Status</p>
-                  <p class="info-bar-value" style="color: #10B981;">Buka</p>
-                </div>
-              </div>
-            </div>
-          </template>
-        </Card>
-      </div>
-
       <!-- ===== FOOTER INFO ===== -->
       <div class="section-block" id="footer-info">
         <Card>
@@ -528,7 +512,7 @@ onUnmounted(() => {
 .hero-header {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-600));
   color: white;
-  padding: 1.5rem 1rem 1.25rem;
+  padding: 1.5rem 1rem 1rem;
   border-radius: 0 0 1.5rem 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -900,6 +884,49 @@ onUnmounted(() => {
   width: 1px;
   height: 2rem;
   background: var(--surface-border);
+}
+
+/* ===== HERO INFO BAR ===== */
+.hero-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 0.875rem;
+  padding: 0.75rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.hero-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hero-info-item i {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-info-label {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hero-info-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  line-height: 1.3;
+}
+
+.hero-info-divider {
+  width: 1px;
+  height: 1.75rem;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* ===== FAB ===== */
