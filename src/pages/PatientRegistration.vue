@@ -81,6 +81,35 @@ const resetForm = () => {
     <!-- Form Sections -->
     <div class="form-sections">
 
+      <!-- Informasi NIK -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <i class="pi pi-id-card"></i>
+          <span>Informasi NIK</span>
+        </div>
+        <div class="form-fields">
+          <div class="form-field">
+            <label class="field-label">Nomor Induk Kependudukan (NIK) <span class="required">*</span></label>
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-id-card"></i>
+              </InputGroupAddon>
+              <InputText 
+                v-model="formData.nik" 
+                type="text" 
+                placeholder="Masukkan NIK Anda"
+              />
+              <Button
+                label="Cari"
+                icon="pi pi-search"
+                severity="info"
+                @click="searchNik"
+              />
+            </InputGroup>
+          </div>
+        </div>
+      </div>
+
       <!-- Section: Identitas Pasien -->
       <div class="form-card">
         <div class="form-card-header">

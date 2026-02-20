@@ -26,6 +26,8 @@ import Message from 'primevue/message'
 import Calendar from 'primevue/calendar'
 import RadioButton from 'primevue/radiobutton'
 import ProgressBar from 'primevue/progressbar'
+import InputGroup from 'primevue/inputgroup'
+import InputGroupAddon from 'primevue/inputgroupaddon'
 
 const myPreset = definePreset(Aura, {
     semantic: {
@@ -79,6 +81,8 @@ app.component('Message', Message)
 app.component('Calendar', Calendar)
 app.component('RadioButton', RadioButton)
 app.component('ProgressBar', ProgressBar)
+app.component('InputGroup', InputGroup)
+app.component('InputGroupAddon', InputGroupAddon)
 
 // Register directives
 app.directive('tooltip', Tooltip)
