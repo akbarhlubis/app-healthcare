@@ -1,10 +1,46 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useDoctorStore } from '../stores/doctorStore'
 
-const doctorStore = useDoctorStore()
+import { ref, computed, onMounted, watch } from 'vue'
+import { useDoctorSchedule } from '../composables/useDoctorSchedule'
+
 const searchQuery = ref('')
 const selectedDay = ref('all')
+const selectedPoli = ref('all')
+
+const { schedules, loading, error, fetchSchedules } = useDoctorSchedule()
+
+// Fetch all schedules on mount
+onMounted(() => {
+  fetchSchedules()
+})
+
+// Refetch when filters change
+watch([selectedDay, selectedPoli], ([day, poli]) => {
+  const params = {}
+  if (day !== 'all') params.hari = day
+  if (poli !== 'all') params.kd_poli = poli
+  fetchSchedules(params)
+})
+
+const filteredSchedules = computed(() => {
+  let list = schedules.value
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    list = list.filter(d =>
+      d.nm_dokter.toLowerCase().includes(q) ||
+      d.nm_poli.toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+const uniquePoli = computed(() => {
+  const map = new Map()
+  schedules.value.forEach(d => {
+    map.set(d.kd_poli, d.nm_poli)
+  })
+  return [{ label: 'Semua Poli', value: 'all' }, ...Array.from(map, ([value, label]) => ({ value, label }))]
+})
 
 const days = [
   { label: 'Semua', value: 'all' },
@@ -16,25 +52,8 @@ const days = [
   { label: 'Sabtu', value: 'Sabtu' }
 ]
 
-const filteredDoctors = computed(() => {
-  let list = doctorStore.doctorList
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase()
-    list = list.filter(d => d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q))
-  }
-  if (selectedDay.value !== 'all') {
-    list = list.filter(d => d.days.includes(selectedDay.value))
-  }
-  return list
-})
 
-const formatDays = (days) => days.join(', ')
-
-const isAvailableToday = (days) => {
-  const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-  const today = dayNames[new Date().getDay()]
-  return days.includes(today)
-}
+const formatTime = (t) => t?.slice(0,5) || ''
 </script>
 
 <template>
@@ -46,7 +65,7 @@ const isAvailableToday = (days) => {
       </div>
       <div>
         <h1 class="page-title">Jadwal Dokter</h1>
-        <p class="page-subtitle">{{ filteredDoctors.length }} dokter tersedia</p>
+        <p class="page-subtitle">{{ filteredSchedules.length }} dokter tersedia</p>
       </div>
     </div>
 
@@ -56,7 +75,7 @@ const isAvailableToday = (days) => {
         <i class="pi pi-search search-icon"></i>
         <InputText 
           v-model="searchQuery"
-          placeholder="Cari nama dokter atau spesialisasi..."
+          placeholder="Cari nama dokter atau poli..."
           class="search-input"
         />
       </div>
@@ -72,78 +91,74 @@ const isAvailableToday = (days) => {
       </div>
     </div>
 
-    <!-- Doctor Cards -->
+    <!-- Doctor Schedule Cards -->
     <div class="doctor-list">
-      <div 
-        v-for="doctor in filteredDoctors" 
-        :key="doctor.id"
-        class="doctor-card"
-      >
-        <div class="doctor-header">
-          <Avatar 
-            :label="doctor.name.charAt(4)" 
-            size="large"
-            shape="circle"
-            style="background: var(--primary-color); color: white; flex-shrink: 0;"
-          />
-          <div class="doctor-header-info">
-            <p class="doctor-name">{{ doctor.name }}</p>
-            <Tag :value="doctor.specialty" severity="info" rounded />
-          </div>
-          <Tag 
-            :value="isAvailableToday(doctor.days) ? 'Aktif' : 'Libur'" 
-            :severity="isAvailableToday(doctor.days) ? 'success' : 'secondary'"
-            rounded
-            class="status-tag"
-          />
-        </div>
-
-        <div class="doctor-details">
-          <div class="detail-row">
-            <i class="pi pi-clock"></i>
-            <span>{{ doctor.time }}</span>
-          </div>
-          <div class="detail-row">
-            <i class="pi pi-briefcase"></i>
-            <span>{{ doctor.experience }}</span>
-          </div>
-          <div class="detail-row">
-            <i class="pi pi-calendar-clock"></i>
-            <span>{{ formatDays(doctor.days) }}</span>
-          </div>
-        </div>
-
-        <div class="doctor-footer">
-          <div class="doctor-rating">
-            <Rating 
-              v-model="doctor.rating" 
-              :readonly="true" 
-              :cancel="false"
-              style="font-size: 0.8rem;"
-            />
-            <span class="rating-num">{{ doctor.rating }}</span>
-          </div>
-          <Button 
-            label="Konsultasi"
-            icon="pi pi-comments"
-            size="small"
-            rounded
-          />
-        </div>
+      <div v-if="loading" class="loading-state">
+        <ProgressBar mode="indeterminate" style="height: 4px; margin-bottom: 1.5rem;" />
+        <p style="text-align:center; color: var(--text-color-secondary);">Memuat jadwal dokter...</p>
       </div>
-
-      <!-- Empty State -->
-      <Card v-if="filteredDoctors.length === 0">
-        <template #content>
-          <div style="text-align: center; padding: 2rem;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔍</div>
-            <p style="font-weight: 600; margin: 0 0 0.5rem;">Dokter tidak ditemukan</p>
-            <p style="font-size: 0.8rem; color: var(--text-color-secondary); margin: 0;">
-              Coba ubah kata kunci pencarian atau filter hari
-            </p>
+      <div v-else-if="error" class="error-state">
+        <Message severity="error">{{ error }}</Message>
+      </div>
+      <template v-else>
+        <div 
+          v-for="item in filteredSchedules" 
+          :key="item.kd_dokter + item.kd_poli + item.hari_kerja + item.jam_mulai"
+          class="doctor-card"
+        >
+          <div class="doctor-header">
+            <Avatar 
+              :label="item.nm_dokter.charAt(4)" 
+              size="large"
+              shape="circle"
+              style="background: var(--primary-color); color: white; flex-shrink: 0;"
+            />
+            <div class="doctor-header-info">
+              <p class="doctor-name">{{ item.nm_dokter }}</p>
+              <Tag :value="item.nm_poli" severity="info" rounded />
+            </div>
+            <Tag 
+              :value="item.hari_kerja" 
+              severity="success"
+              rounded
+              class="status-tag"
+            />
           </div>
-        </template>
-      </Card>
+
+          <div class="doctor-details">
+            <div class="detail-row">
+              <i class="pi pi-clock"></i>
+              <span>{{ formatTime(item.jam_mulai) }} - {{ formatTime(item.jam_selesai) }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="pi pi-calendar-clock"></i>
+              <span>{{ item.hari_kerja }}</span>
+            </div>
+          </div>
+
+          <div class="doctor-footer">
+            <Button 
+              label="Konsultasi"
+              icon="pi pi-comments"
+              size="small"
+              rounded
+            />
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <Card v-if="filteredSchedules.length === 0">
+          <template #content>
+            <div style="text-align: center; padding: 2rem;">
+              <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔍</div>
+              <p style="font-weight: 600; margin: 0 0 0.5rem;">Jadwal tidak ditemukan</p>
+              <p style="font-size: 0.8rem; color: var(--text-color-secondary); margin: 0;">
+                Coba ubah kata kunci pencarian atau filter
+              </p>
+            </div>
+          </template>
+        </Card>
+      </template>
     </div>
   </div>
 </template>

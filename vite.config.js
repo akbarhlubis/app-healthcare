@@ -8,4 +8,13 @@ export default defineConfig({
     vue(),
     tailwindcss()
   ],
+  server: {
+    proxy: {
+      '/simrs': {
+        target: 'http://localhost/rsud-tgms/api',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
 })
