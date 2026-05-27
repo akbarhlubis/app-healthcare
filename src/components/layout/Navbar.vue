@@ -13,7 +13,7 @@ const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wiki
 const menuItems = [
   { label: 'Home', icon: 'pi pi-home', to: '/' },
   { label: 'Dokter', icon: 'pi pi-calendar', to: '/jadwal-dokter' },
-  { label: 'Survey', icon: 'pi pi-chart-bar', to: '/survey-kemasyarakatan' },
+  { label: 'Survey', icon: 'pi pi-chart-bar', to: '/survey/survey-kepuasan' },
   { label: 'Daftar', icon: 'pi pi-user-plus', to: '/daftar-pasien' }
 ]
 

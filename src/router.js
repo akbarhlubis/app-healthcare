@@ -18,7 +18,7 @@ const routes = [
     meta: { title: 'Jadwal Dokter' }
   },
   {
-    path: '/survey-kemasyarakatan',
+    path: '/survey/:slug',
     name: 'MedicalSurvey',
     component: MedicalSurvey,
     meta: { title: 'Survey Kemasyarakatan' }

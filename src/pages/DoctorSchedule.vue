@@ -80,14 +80,12 @@ const formatTime = (t) => t?.slice(0,5) || ''
         />
       </div>
       <div class="day-filter-scroll">
-        <button
-          v-for="day in days"
-          :key="day.value"
-          :class="['day-chip', { active: selectedDay === day.value }]"
-          @click="selectedDay = day.value"
-        >
-          {{ day.label }}
-        </button>
+        <SelectButton
+          v-model="selectedDay"
+          :options="days"
+          optionLabel="label"
+          optionValue="value"
+        />
       </div>
     </div>
 
@@ -250,33 +248,6 @@ const formatTime = (t) => t?.slice(0,5) || ''
 
 .day-filter-scroll::-webkit-scrollbar {
   display: none;
-}
-
-.day-chip {
-  padding: 0.4rem 0.9rem;
-  border-radius: 2rem;
-  border: 1px solid var(--surface-border);
-  background: var(--surface-card);
-  color: var(--text-color-secondary);
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.day-chip:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-.day-chip.active {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-  font-weight: 600;
 }
 
 /* Doctor Cards */

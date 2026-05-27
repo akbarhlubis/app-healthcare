@@ -85,7 +85,7 @@ const serviceMenu = [
     bgColor: '#F5F3FF',
     darkBgColor: '#3B2667',
     category: 'pelayanan',
-    action: () => router.push('/survey-kemasyarakatan')
+    action: () => router.push('/survey/survey-kepuasan')
   },
   {
     label: 'Daftar Umum',
@@ -151,7 +151,7 @@ const quickAccess = [
   { label: 'Dokter Hari Ini', icon: 'pi pi-calendar-clock', severity: 'info', action: () => router.push('/jadwal-dokter') },
   { label: 'Daftar Cepat', icon: 'pi pi-bolt', severity: 'warning', action: () => router.push('/daftar-pasien') },
   { label: 'BPJS Mobile', icon: 'pi pi-mobile', severity: 'success', action: redirectToBPJSApp },
-  { label: 'Survey', icon: 'pi pi-chart-bar', severity: 'help', action: () => router.push('/survey-kemasyarakatan') }
+  { label: 'Survey', icon: 'pi pi-chart-bar', severity: 'help', action: () => router.push('/survey/survey-kepuasan') }
 ]
 
 // Promo / announcement cards
