@@ -4,15 +4,14 @@ const hospitalName = import.meta.env.VITE_HOSPITAL_NAME || 'Rumah Sakit'
 const hospitalAddress = import.meta.env.VITE_HOSPITAL_ADDRESS || 'Alamat Rumah Sakit'
 const hospitalPhone = import.meta.env.VITE_HOSPITAL_PHONE || '+62-21-1234-5678'
 const hospitalEmail = import.meta.env.VITE_HOSPITAL_EMAIL || 'info@hospital.com'
-const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Lambang_Kabupaten_Tanggamus.png'
+const hospitalLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Lambang_Kabupaten_Tanggamus.png'
 </script>
 
 <template>
   <footer class="app-footer" id="footer-info">
     <div class="footer-wrapper">
-      <!-- Logo & Name -->
       <div class="footer-brand">
-        <img :src="hospitallLogo" class="footer-logo" alt="Logo" />
+        <img :src="hospitalLogo" class="footer-logo" alt="Logo" />
         <div>
           <p class="footer-name">{{ hospitalName }}</p>
           <p class="footer-tagline">Pelayanan Kesehatan Terpadu</p>
@@ -21,7 +20,6 @@ const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wiki
 
       <hr class="footer-divider" />
 
-      <!-- Contact Grid -->
       <div class="footer-contacts">
         <div class="footer-contact-item">
           <div class="footer-contact-icon">
@@ -54,7 +52,6 @@ const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wiki
 
       <hr class="footer-divider" />
 
-      <!-- Operating Hours -->
       <div class="footer-hours">
         <p class="footer-hours-title"><i class="pi pi-clock"></i> Jam Operasional</p>
         <div class="footer-hours-grid">
@@ -71,18 +68,16 @@ const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wiki
             <span class="footer-hours-time closed">Tutup</span>
           </div>
         </div>
-        <!-- IGD Badge -->
         <div class="footer-igd">
           <i class="pi pi-shield"></i>
-          <span>IGD (Instalasi Gawat Darurat) — <strong>Buka 24 Jam</strong></span>
+          <span>IGD (Instalasi Gawat Darurat) - <strong>Buka 24 Jam</strong></span>
         </div>
       </div>
 
       <hr class="footer-divider" />
 
-      <!-- Copyright -->
       <p class="footer-copyright">
-        © 2026 {{ appName }} — Dibuat dengan <i class="pi pi-heart-fill" style="color: #EF4444; font-size: 0.6rem;"></i> untuk pelayanan yang lebih baik
+        (c) 2026 {{ appName }} - Dibuat untuk pelayanan yang lebih baik
       </p>
     </div>
   </footer>

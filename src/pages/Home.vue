@@ -1,38 +1,37 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useDoctorStore } from '../stores/doctorStore'
+import { useDoctorSchedule } from '../composables/useDoctorSchedule'
 import { useAuthStore } from '../stores/authStore'
 import { useDarkModeStore } from '../stores/darkModeStore'
+import { surveyApi } from '../utils/api'
 
 const router = useRouter()
-const doctorStore = useDoctorStore()
 const authStore = useAuthStore()
 const darkModeStore = useDarkModeStore()
+const { schedules: todaySchedules, loading: doctorsLoading, error: doctorsError, fetchSchedules } = useDoctorSchedule()
 
 const currentDateTime = ref(new Date())
+const surveyPath = ref('')
 
-const appName = import.meta.env.VITE_APP_NAME || 'Healthcare App'
-const hospitalName = import.meta.env.VITE_HOSPITAL_NAME || 'Rumah Sakit'
-const hospitalAddress = import.meta.env.VITE_HOSPITAL_ADDRESS || 'Alamat Rumah Sakit'
 const hospitalPhone = import.meta.env.VITE_HOSPITAL_PHONE || '+62-21-1234-5678'
-const hospitalEmail = import.meta.env.VITE_HOSPITAL_EMAIL || 'info@hospital.com'
-const hospitallLogo = import.meta.env.VITE_HOSPITAL_LOGO || 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Lambang_Kabupaten_Tanggamus.png'
 
 const activeCategory = ref('semua')
 
-const formatDateTime = () => {
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZone: 'Asia/Jakarta'
+const loadActiveSurvey = async () => {
+  try {
+    const data = await surveyApi.listSurveys()
+    const firstSurvey = data.response?.[0]
+    surveyPath.value = firstSurvey?.slug ? `/survey/${firstSurvey.slug}` : ''
+  } catch {
+    surveyPath.value = ''
   }
-  return new Intl.DateTimeFormat('id-ID', options).format(currentDateTime.value)
+}
+
+const navigateToSurvey = () => {
+  if (surveyPath.value) {
+    router.push(surveyPath.value)
+  }
 }
 
 const formatDateShort = () => {
@@ -43,6 +42,47 @@ const formatDateShort = () => {
 const formatTime = () => {
   const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }
   return new Intl.DateTimeFormat('id-ID', options).format(currentDateTime.value)
+}
+
+const currentDayName = computed(() => {
+  const options = { weekday: 'long', timeZone: 'Asia/Jakarta' }
+  return new Intl.DateTimeFormat('id-ID', options).format(currentDateTime.value)
+})
+
+const operatingStatus = computed(() => {
+  const day = currentDayName.value
+  const hour = Number(new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Jakarta',
+  }).format(currentDateTime.value))
+
+  if (day === 'Minggu') return { label: 'Tutup', color: '#F87171' }
+  if (day === 'Sabtu') return hour >= 8 && hour < 14
+    ? { label: 'Buka', color: '#34D399' }
+    : { label: 'Tutup', color: '#F87171' }
+
+  return hour >= 8 && hour < 20
+    ? { label: 'Buka', color: '#34D399' }
+    : { label: 'Tutup', color: '#F87171' }
+})
+
+const whatsappUrl = computed(() => {
+  const digits = hospitalPhone.replace(/\D/g, '')
+  if (!digits) return 'https://wa.me/6281234567890'
+  const normalized = digits.startsWith('0') ? `62${digits.slice(1)}` : digits
+  return `https://wa.me/${normalized}`
+})
+
+const doctorInitial = (name = '') => {
+  const cleaned = name.replace(/^dr\.?\s*/i, '').trim()
+  return cleaned.charAt(0).toUpperCase() || 'D'
+}
+
+const formatScheduleTime = (item) => {
+  const start = item.jam_mulai?.slice(0, 5)
+  const end = item.jam_selesai?.slice(0, 5)
+  return start && end ? `${start} - ${end}` : item.jam || 'Jadwal tersedia'
 }
 
 const bpjsLinks = {
@@ -85,7 +125,8 @@ const serviceMenu = [
     bgColor: '#F5F3FF',
     darkBgColor: '#3B2667',
     category: 'pelayanan',
-    action: () => router.push('/survey/survey-kepuasan')
+    action: navigateToSurvey,
+    disabled: () => !surveyPath.value
   },
   {
     label: 'Daftar Umum',
@@ -151,7 +192,7 @@ const quickAccess = [
   { label: 'Dokter Hari Ini', icon: 'pi pi-calendar-clock', severity: 'info', action: () => router.push('/jadwal-dokter') },
   { label: 'Daftar Cepat', icon: 'pi pi-bolt', severity: 'warning', action: () => router.push('/daftar-pasien') },
   { label: 'BPJS Mobile', icon: 'pi pi-mobile', severity: 'success', action: redirectToBPJSApp },
-  { label: 'Survey', icon: 'pi pi-chart-bar', severity: 'help', action: () => router.push('/survey/survey-kepuasan') }
+  { label: 'Survey', icon: 'pi pi-chart-bar', severity: 'help', action: navigateToSurvey, disabled: () => !surveyPath.value }
 ]
 
 // Promo / announcement cards
@@ -193,25 +234,18 @@ const scrollToFooter = () => {
 }
 
 let timeInterval = null
-let doctorInterval = null
 
 onMounted(() => {
-  doctorStore.getTodayDoctors()
+  loadActiveSurvey()
+  fetchSchedules({ hari: currentDayName.value.toUpperCase() })
   
   timeInterval = setInterval(() => {
     currentDateTime.value = new Date()
   }, 1000)
-  
-  if (doctorStore.todayDoctors.length > 0) {
-    doctorInterval = setInterval(() => {
-      doctorStore.getNextDoctor()
-    }, 5000)
-  }
 })
 
 onUnmounted(() => {
   if (timeInterval) clearInterval(timeInterval)
-  if (doctorInterval) clearInterval(doctorInterval)
 })
 </script>
 
@@ -224,7 +258,7 @@ onUnmounted(() => {
         <div class="hero-top">
           <div class="hero-greeting">
             <p class="hero-welcome">
-              {{ authStore.isLoggedIn ? `Halo, ${authStore.userName}! 👋` : 'Selamat Datang! 👋' }}
+              {{ authStore.isLoggedIn ? `Halo, ${authStore.userName}!` : 'Selamat Datang!' }}
             </p>
             <p class="hero-subtitle">{{ formatDateShort() }}</p>
           </div>
@@ -250,15 +284,15 @@ onUnmounted(() => {
             <i class="pi pi-users"></i>
             <div>
               <p class="hero-info-label">Dokter Aktif</p>
-              <p class="hero-info-value">{{ doctorStore.todayDoctors.length }} Dokter</p>
+              <p class="hero-info-value">{{ todaySchedules.length }} Dokter</p>
             </div>
           </div>
           <div class="hero-info-divider"></div>
           <div class="hero-info-item">
-            <i class="pi pi-check-circle" style="color: #34D399;"></i>
+            <i class="pi pi-check-circle" :style="{ color: operatingStatus.color }"></i>
             <div>
               <p class="hero-info-label">Status</p>
-              <p class="hero-info-value" style="color: #34D399;">Buka</p>
+              <p class="hero-info-value" :style="{ color: operatingStatus.color }">{{ operatingStatus.label }}</p>
             </div>
           </div>
         </div>
@@ -293,7 +327,7 @@ onUnmounted(() => {
           <div 
             v-for="(item, i) in quickAccess" 
             :key="i" 
-            class="quick-access-chip"
+            :class="['quick-access-chip', { disabled: item.disabled?.() }]"
             @click="item.action"
           >
             <i :class="item.icon" class="quick-access-icon"></i>
@@ -327,7 +361,7 @@ onUnmounted(() => {
           <div 
             v-for="(service, i) in filteredMenu" 
             :key="i" 
-            class="service-grid-item"
+            :class="['service-grid-item', { disabled: service.disabled?.() }]"
             @click="service.action"
           >
             <div class="service-icon-wrapper" :style="{ backgroundColor: getServiceBg(service) }">
@@ -353,38 +387,38 @@ onUnmounted(() => {
         </div>
 
         <!-- Doctor Cards Horizontal Scroll -->
-        <div v-if="doctorStore.todayDoctors.length > 0" class="doctor-scroll">
-          <div 
-            v-for="doctor in doctorStore.todayDoctors" 
-            :key="doctor.id" 
+        <div v-if="doctorsLoading" class="doctor-loading">
+          <ProgressBar mode="indeterminate" style="height:4px;margin-bottom:0.75rem" />
+          <p>Memuat jadwal dokter hari ini...</p>
+        </div>
+
+        <Message v-else-if="doctorsError" severity="warn" style="margin-bottom:0.75rem;border-radius:0.75rem">
+          {{ doctorsError }}
+        </Message>
+
+        <div v-else-if="todaySchedules.length > 0" class="doctor-scroll">
+          <div
+            v-for="doctor in todaySchedules"
+            :key="doctor.kd_dokter + doctor.kd_poli + doctor.hari_kerja + doctor.jam_mulai"
             class="doctor-card"
           >
             <div class="doctor-card-top">
               <Avatar 
-                :label="doctor.name.charAt(4)" 
+                :label="doctorInitial(doctor.nm_dokter)"
                 size="large" 
                 shape="circle"
                 style="background: var(--primary-color); color: white;"
               />
-              <Tag :value="doctor.specialty" severity="info" rounded />
+              <Tag :value="doctor.nm_poli" severity="info" rounded />
             </div>
-            <p class="doctor-name">{{ doctor.name }}</p>
+            <p class="doctor-name">{{ doctor.nm_dokter }}</p>
             <div class="doctor-info-row">
               <i class="pi pi-clock"></i>
-              <span>{{ doctor.time }}</span>
+              <span>{{ formatScheduleTime(doctor) }}</span>
             </div>
             <div class="doctor-info-row">
-              <i class="pi pi-briefcase"></i>
-              <span>{{ doctor.experience }}</span>
-            </div>
-            <div class="doctor-rating">
-              <Rating 
-                v-model="doctor.rating" 
-                :readonly="true" 
-                :cancel="false"
-                style="font-size: 0.75rem;"
-              />
-              <span class="rating-number">{{ doctor.rating }}</span>
+              <i class="pi pi-calendar-clock"></i>
+              <span>{{ doctor.hari_kerja }}</span>
             </div>
           </div>
         </div>
@@ -393,7 +427,9 @@ onUnmounted(() => {
         <Card v-else>
           <template #content>
             <div style="text-align: center; padding: 2rem 1rem;">
-              <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">😴</div>
+              <div style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--primary-color);">
+                <i class="pi pi-calendar-times"></i>
+              </div>
               <p style="font-weight: 600; margin: 0 0 0.5rem;">Tidak ada jadwal dokter hari ini</p>
               <p style="font-size: 0.8rem; color: var(--text-color-secondary); margin: 0;">Silakan cek kembali besok</p>
             </div>
@@ -444,7 +480,7 @@ onUnmounted(() => {
         severity="success"
         class="fab-button"
         v-tooltip.left="'Hubungi via WhatsApp'"
-        @click="window.open('https://wa.me/6281234567890', '_blank')"
+        @click="window.open(whatsappUrl, '_blank')"
       />
     </div>
 
@@ -642,6 +678,13 @@ onUnmounted(() => {
   color: var(--primary-color);
 }
 
+.quick-access-chip.disabled,
+.service-grid-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .quick-access-icon {
   font-size: 1rem;
   color: var(--primary-color);
@@ -726,6 +769,20 @@ onUnmounted(() => {
 
 .doctor-scroll::-webkit-scrollbar {
   display: none;
+}
+
+.doctor-loading {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.875rem;
+  padding: 1rem;
+}
+
+.doctor-loading p {
+  color: var(--text-color-secondary);
+  font-size: 0.8rem;
+  margin: 0;
+  text-align: center;
 }
 
 .doctor-card {

@@ -18,8 +18,8 @@ export function useSurvey() {
       const data = await surveyApi.getSurvey(slug)
       form.value = data.response
     } catch (e) {
+      form.value = null
       error.value = e.message || 'Gagal memuat survey'
-      console.error('fetchSurvey error:', e)
     } finally {
       loading.value = false
     }

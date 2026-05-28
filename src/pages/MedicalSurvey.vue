@@ -12,10 +12,12 @@ import Message from 'primevue/message'
 import ProgressBar from 'primevue/progressbar'
 import Select from 'primevue/select'
 import { surveyApi } from '../utils/api'
+import { useAuthStore } from '../stores/authStore'
 import { useToast } from 'primevue/usetoast'
 
 const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 const router = useRouter()
 const { form, loading, submitting, error, submitResult, fetchSurvey, getVisibleRequiredIds, submitAnswers } = useSurvey()
 
@@ -46,6 +48,12 @@ const loadSurvey = async (slug) => {
   submitResult.value = null
   revealedQuestions.value = new Set()
   await fetchSurvey(slug)
+  if (!form.value) {
+    if (surveys.value.length > 0) {
+      setTimeout(() => switchSurvey(surveys.value[0].slug), 3000)
+    }
+    return
+  }
   if (form.value?.questions) {
     form.value.questions.forEach(q => {
       if (q.type === 'checkbox') answers.value[q.id] = []
@@ -144,14 +152,17 @@ const switchSurvey = (slug) => {
       <p style="text-align:center;margin-top:1rem;color:var(--text-color-secondary)">Memuat survey...</p>
     </div>
 
-    <Message v-else-if="error && !form" severity="error" style="margin-bottom:1rem;border-radius:0.75rem">
-      {{ error }}
-    </Message>
+    <div v-else-if="error && !form" style="text-align:center;padding:2rem 1rem">
+      <div style="font-size:3rem;margin-bottom:1rem;color:var(--primary-color)"><i class="pi pi-clipboard"></i></div>
+      <p style="font-weight:600;margin:0 0 0.5rem">Survey tidak tersedia</p>
+      <p style="color:var(--text-color-secondary);margin:0 0 1rem">{{ error }}</p>
+      <p style="font-size:0.85rem;color:var(--text-color-secondary)">Pilih survey lain dari dropdown di atas</p>
+    </div>
 
 
 
     <div v-if="form?.questions" class="survey-form">
-      <div class="form-card">
+      <div v-if="!authStore.isLoggedIn" class="form-card">
         <div class="form-card-header">
           <i class="pi pi-user"></i>
           <span>Nama Anda</span>

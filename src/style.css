@@ -118,6 +118,19 @@ body {
   padding: 1.5rem;
 }
 
+/* Keep floating PrimeVue overlays visually above page cards/hero sections. */
+.p-popover,
+.p-select-overlay,
+.p-datepicker,
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  z-index: 1300;
+}
+
 /* PrimeVue Toolbar Customization */
 .p-toolbar {
   background-color: var(--surface-0);

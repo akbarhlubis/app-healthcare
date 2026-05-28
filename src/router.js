@@ -1,42 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from './pages/Home.vue'
-import DoctorSchedule from './pages/DoctorSchedule.vue'
-import MedicalSurvey from './pages/MedicalSurvey.vue'
-import PatientRegistration from './pages/PatientRegistration.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-    meta: { title: 'Home' }
-  },
-  {
-    path: '/jadwal-dokter',
-    name: 'DoctorSchedule',
-    component: DoctorSchedule,
-    meta: { title: 'Jadwal Dokter' }
-  },
-  {
-    path: '/survey/:slug',
-    name: 'MedicalSurvey',
-    component: MedicalSurvey,
-    meta: { title: 'Survey Kemasyarakatan' }
-  },
-  {
-    path: '/daftar-pasien',
-    name: 'PatientRegistration',
-    component: PatientRegistration,
-    meta: { title: 'Daftar Pasien' }
-  }
+  { path: '/', name: 'Home', component: () => import('./pages/Home.vue'), meta: { title: 'Home' } },
+  { path: '/jadwal-dokter', name: 'DoctorSchedule', component: () => import('./pages/DoctorSchedule.vue'), meta: { title: 'Jadwal Dokter' } },
+  { path: '/survey/:slug', name: 'MedicalSurvey', component: () => import('./pages/MedicalSurvey.vue'), meta: { title: 'Survey' } },
+  { path: '/forgot-password', name: 'ForgotPassword', component: () => import('./pages/ForgotPassword.vue'), meta: { title: 'Lupa Password' } },
+  { path: '/reset-password', name: 'ResetPassword', component: () => import('./pages/ResetPassword.vue'), meta: { title: 'Reset Password' } },
+  { path: '/riwayat-kunjungan', name: 'VisitHistory', component: () => import('./pages/VisitHistory.vue'), meta: { title: 'Riwayat Kunjungan' } },
+  { path: '/profile', name: 'Profile', component: () => import('./pages/Profile.vue'), meta: { title: 'Profil' } },
+  { path: '/register', name: 'Register', component: () => import('./pages/Register.vue'), meta: { title: 'Registrasi' } },
+  { path: '/daftar-pasien', name: 'PatientRegistration', component: () => import('./pages/PatientRegistration.vue'), meta: { title: 'Daftar Pasien' } },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('./pages/NotFound.vue'), meta: { title: '404' } },
 ]
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
-// Update document title
 router.afterEach((to) => {
   document.title = `${to.meta.title} | Healthcare App`
 })

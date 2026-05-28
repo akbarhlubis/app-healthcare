@@ -16,5 +16,16 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 650,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vue: ['vue', 'vue-router', 'pinia'],
+          primevue: ['primevue/config', 'primevue/usetoast', 'primevue/toastservice'],
+        },
+      },
+    },
   }
 })

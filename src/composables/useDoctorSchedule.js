@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-const API_URL = 'http://localhost/rsud-tgms/api/jadwal-dokter'
-const API_KEY = 'majumundurok' // Ganti dengan token yang sesuai
+const API_URL = import.meta.env.VITE_DOCTOR_SCHEDULE_API_URL || 'http://localhost/rsud-tgms/api/jadwal-dokter'
+const API_KEY = import.meta.env.VITE_DOCTOR_SCHEDULE_API_KEY || 'majumundurok'
 
 export function useDoctorSchedule() {
   const schedules = ref([])
@@ -21,22 +21,14 @@ export function useDoctorSchedule() {
       const response = await fetch(url, {
         headers: { 'X-key': API_KEY }
       })
-      // Log response status and URL
-      console.log('Fetch URL:', url)
-      console.log('Response status:', response.status)
       const data = await response.json()
-      console.log('Response body:', data)
       if (data && data.metaData && data.metaData.kode === 200) {
         schedules.value = data.response || []
       } else {
         error.value = data?.metaData?.message || 'Gagal memuat jadwal dokter'
-        // Log error details
-        console.error('API error:', error.value)
       }
     } catch (e) {
       error.value = e.message || 'Gagal memuat jadwal dokter'
-      // Log fetch exception
-      console.error('Fetch exception:', e)
     } finally {
       loading.value = false
     }
