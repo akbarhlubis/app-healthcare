@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "cd server && bun run --watch src/index.ts",
+    "dev:all": "bun run dev & bun run dev:server",
     "build": "vite build",
+    "build:server": "cd server && bun build src/index.ts --outdir dist --target bun",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-const API_URL = import.meta.env.VITE_DOCTOR_SCHEDULE_API_URL || 'http://localhost/rsud-tgms/api/jadwal-dokter'
+const API_URL = import.meta.env.VITE_DOCTOR_SCHEDULE_API_URL || '/api/jadwal-dokter'
 const API_KEY = import.meta.env.VITE_DOCTOR_SCHEDULE_API_KEY || 'majumundurok'
 
 export function useDoctorSchedule() {

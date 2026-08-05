@@ -10,8 +10,13 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/simrs': {
-        target: 'http://localhost/rsud-tgms/api',
+      '/api': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+        secure: false
+      },
+      '/v1': {
+        target: 'http://127.0.0.1:3001',
         changeOrigin: true,
         secure: false
       }

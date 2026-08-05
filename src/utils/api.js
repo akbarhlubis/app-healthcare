@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_PORTAL_API_URL || 'http://localhost/rsud-tgms/api/v1/portal'
+const BASE_URL = import.meta.env.VITE_PORTAL_API_URL || '/v1/portal'
 
 export async function apiFetch(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`
