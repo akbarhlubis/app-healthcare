@@ -330,73 +330,31 @@ app-healthcare/
 
 ## 🔄 Switch Backend: Elysia ↔ Laravel
 
-Frontend **tidak peduli** backend apa. Cukup ubah URL target.
+Frontend **tidak peduli** backend apa — cukup ubah **1 variabel** di satu file `.env` (root project).
 
-### Metode 1: Environment Variable (recommended)
+### Langkah
 
-Buat file `.env` di root project:
+Buka `.env` di root project, ubah `BACKEND_MODE`:
 
-```bash
-# .env (app-healthcare root, GITIGNORED)
-
-# === Pakai Elysia (default) ===
-# VITE_PORTAL_API_URL=/v1/portal
-# VITE_DOCTOR_SCHEDULE_API_URL=/api/jadwal-dokter
-
-# === Pakai Laravel ===
-VITE_PORTAL_API_URL=http://localhost/rsud-tgms/api/v1/portal
-VITE_DOCTOR_SCHEDULE_API_URL=http://localhost/rsud-tgms/api/jadwal-dokter
+```env
+# ===== Pilih backend =====
+BACKEND_MODE=elysia    # Elysia (server/, port 3001) — default
+# BACKEND_MODE=laravel  # SIMRS Laravel (rsud-tgms) — isi LARAVEL_API_URL
+LARAVEL_API_URL=http://localhost/rsud-tgms/api
 ```
 
-Restart `bun run dev`.
+Restart: `bun run dev` (+ `bun run dev:server` jika pakai Elysia).
 
-### Metode 2: Edit 2 File
+### Cara kerja
 
-**`vite.config.js`** — arahkan proxy:
+- `vite.config.js` membaca `BACKEND_MODE` dan mengarahkan proxy `/api` & `/v1`:
+  - `elysia` → `http://127.0.0.1:3001`
+  - `laravel` → `LARAVEL_API_URL` (prefix `/api` otomatis di-strip di proxy `/api`)
+- Frontend selalu memakai path relatif (`/v1/portal`, `/api/jadwal-dokter`) — tidak ada yang perlu diubah di kode.
+- File `.env` ini **satu-satunya** sumber konfigurasi: branding, frontend API, dan config backend Elysia (DB, mail, port) dibaca dari sini (`server/` otomatis memuatnya).
 
-```js
-// Elysia (default)
-proxy: {
-  '/api': { target: 'http://localhost:3001', ... },
-  '/v1':  { target: 'http://localhost:3001', ... },
-}
-
-// Laravel
-proxy: {
-  '/api': { target: 'http://localhost/rsud-tgms/api', ... },
-  '/v1':  { target: 'http://localhost/rsud-tgms/api', ... },
-}
-```
-
-**`src/utils/api.js`** — ubah base URL:
-
-```js
-// Elysia (via proxy)
-const BASE_URL = '/v1/portal'
-
-// Laravel (direct URL)
-const BASE_URL = 'http://localhost/rsud-tgms/api/v1/portal'
-```
-
-**`src/composables/useDoctorSchedule.js`**:
-
-```js
-// Elysia (via proxy)
-const API_URL = '/api/jadwal-dokter'
-
-// Laravel (direct URL)
-const API_URL = 'http://localhost/rsud-tgms/api/jadwal-dokter'
-```
-
-### ⏱ Waktu Switch: < 2 menit
-
-| Langkah | Waktu |
-|---------|:----:|
-| Ubah 1 file `.env` | 30 detik |
-| Restart `bun run dev` | 5 detik |
-| **Total** | **35 detik** |
-
-> ✅ **Zero downtime** — frontend otomatis reload via Vite HMR setelah restart.
+> ⚠️ `server/.env` tidak lagi diperlukan — sudah digabung ke `.env` root.
+> ⚠️ Mode `laravel` berlaku untuk development (Vite proxy). Untuk produksi, arahkan Nginx ke backend yang aktif.
 
 ---
 

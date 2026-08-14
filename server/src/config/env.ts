@@ -1,4 +1,26 @@
 import { z } from 'zod'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+/**
+ * Single-file env: load the monorepo root .env (repo root = parent of server/)
+ * before reading process.env, so the same file also feeds the backend.
+ * Values already in process.env (e.g. aaPanel panel env) always win.
+ */
+function loadRootEnv() {
+  const candidates = [join(process.cwd(), '..', '.env'), join(process.cwd(), '.env')]
+  for (const file of candidates) {
+    if (!existsSync(file)) continue
+    for (const line of readFileSync(file, 'utf8').split('\n')) {
+      const m = line.match(/^\s*([\w.-]+)\s*=\s*(.*?)\s*$/)
+      if (m && process.env[m[1]] === undefined) {
+        process.env[m[1]] = m[2].replace(/^["']|["']$/g, '')
+      }
+    }
+    break
+  }
+}
+loadRootEnv()
 
 /**
  * Centralized environment config.
