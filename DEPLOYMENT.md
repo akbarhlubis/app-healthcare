@@ -117,10 +117,10 @@ Backend membaca IP client dari `X-Forwarded-For`/`X-Real-IP` (lihat
 curl http://127.0.0.1:3001/api/health
 # → {"status":"ok","timestamp":"..."}
 
-# smoke test inti
-curl -X POST http://127.0.0.1:3001/v1/portal/login \
-  -H 'Content-Type: application/json' \
-  -d '{"no_ktp":"<nik>","tgl_lahir":"<yyyy-mm-dd>","password":"<pass>"}'
+# atau pakai smoke test lengkap (Elysia & Laravel, satu file):
+bun run check:api                          # Elysia default
+bun run check:api -- --base http://localhost/rsud-tgms --key <key-simrs>   # Laravel
+NIK=... DOB=yyyy-mm-dd PASSWORD=... bun run check:api   # termasuk alur login
 ```
 
 ## 6. Catatan produksi

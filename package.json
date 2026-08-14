@@ -9,6 +9,7 @@
     "dev:all": "bun run dev & bun run dev:server",
     "build": "vite build",
     "build:server": "cd server && bun run build",
+    "check:api": "node scripts/smoke-test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
