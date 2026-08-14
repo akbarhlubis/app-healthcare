@@ -35,6 +35,26 @@ bun run build
 ls dist/
 ```
 
+### Tanpa Bun — npm/Node saja
+
+Bun hanya dipakai untuk install & build. Kalau bun bermasalah di server,
+seluruh alur bisa pakai npm + Node:
+
+```bash
+# frontend (vite via npm)
+npm install
+npm run build
+
+# backend — jalankan langsung dari source via tsx (tanpa build)
+cd server
+npm install
+npm run start:tsx          # setara node dist/index.js, tanpa butuh bun
+```
+
+> `npm run start` (node `dist/index.js`) tetap dipakai kalau `dist/` sudah ada
+> (misal hasil build di mesin lain). `start:tsx` menghilangkan kebutuhan
+> `bun build` di server.
+
 ## 2. Environment (`server/.env`)
 
 Salin dari `server/.env.example` lalu isi. Produksi **wajib** (startup fail-fast jika kurang):
