@@ -43,7 +43,6 @@ const EnvSchema = z.object({
   MAIL_PASSWORD: z.string().default(''),
   MAIL_FROM_ADDRESS: z.string().default(''),
   MAIL_FROM_NAME: z.string().default('RSUD'),
-  DOCTOR_SCHEDULE_API_KEY: z.string().default('majumundurok'),
   // Reserved — tokens are random strings stored in DB (Laravel-compatible), JWT not used yet.
   JWT_SECRET: z.string().optional(),
 })

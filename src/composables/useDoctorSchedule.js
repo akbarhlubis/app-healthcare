@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 const API_URL = import.meta.env.VITE_DOCTOR_SCHEDULE_API_URL || '/api/jadwal-dokter'
-const API_KEY = import.meta.env.VITE_DOCTOR_SCHEDULE_API_KEY || 'majumundurok'
+// Key opsional — hanya mode Laravel (SIMRS) yang membutuhkannya.
+// Isi VITE_DOCTOR_SCHEDULE_API_KEY di .env lokal (GITIGNORED), JANGAN commit.
+const API_KEY = import.meta.env.VITE_DOCTOR_SCHEDULE_API_KEY || ''
 
 export function useDoctorSchedule() {
   const schedules = ref([])
@@ -19,7 +21,7 @@ export function useDoctorSchedule() {
         .join('&')
       const url = query ? `${API_URL}?${query}` : API_URL
       const response = await fetch(url, {
-        headers: { 'X-key': API_KEY }
+        headers: API_KEY ? { 'X-key': API_KEY } : {}
       })
       const data = await response.json()
       if (data && data.metaData && data.metaData.kode === 200) {

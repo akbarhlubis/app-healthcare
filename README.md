@@ -108,7 +108,6 @@ DB_PASSWORD=
 
 JWT_SECRET=portal-rsud-jwt-secret-change-in-production
 FRONTEND_URL=http://localhost:5173
-DOCTOR_SCHEDULE_API_KEY=majumundurok
 PORT=3001
 ```
 
@@ -206,7 +205,6 @@ npm run dev
 | `DB_PASSWORD` | _(empty)_ | Password MySQL |
 | `FRONTEND_URL` | `http://localhost:5173` | Origin frontend (CORS) |
 | `PORT` | `3001` | Port backend |
-| `DOCTOR_SCHEDULE_API_KEY` | `majumundurok` | API key jadwal dokter |
 | `MAIL_HOST` | `smtp-relay.brevo.com` | SMTP untuk reset password |
 | `MAIL_PORT` | `587` | SMTP port |
 | `MAIL_USERNAME` | _(empty)_ | SMTP username |

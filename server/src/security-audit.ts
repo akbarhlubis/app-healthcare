@@ -91,9 +91,7 @@ const sqli = await app.handle(new Request('http://localhost/v1/portal/login', {
 pass('SQLi rejected', sqli.status !== 500, `status ${sqli.status}`)
 
 console.log('  H6: SQLi — query params')
-const sqliDoc = await app.handle(new Request('http://localhost/api/jadwal-dokter?kd_dokter=%27%20OR%20%271%27%3D%271', {
-  headers: { 'X-key': 'majumundurok' },
-}))
+const sqliDoc = await app.handle(new Request('http://localhost/api/jadwal-dokter?kd_dokter=%27%20OR%20%271%27%3D%271'))
 pass('SQLi doc handled', sqliDoc.status === 200, `status ${sqliDoc.status}`)
 
 console.log('  H7: Long input')

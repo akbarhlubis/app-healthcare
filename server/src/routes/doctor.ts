@@ -1,17 +1,14 @@
 import { Elysia } from 'elysia'
 import { db } from '../db'
-import { ok, fail } from '../middleware/auth'
-import { env } from '../config/env'
+import { ok } from '../middleware/auth'
 
+/**
+ * Public schedule data — no API key required.
+ * Doctor schedules are not sensitive; abuse is handled by rate limiting
+ * and (optionally) caching at the Nginx layer.
+ */
 export const doctorRoutes = new Elysia({ prefix: '/api' })
-  .get('/jadwal-dokter', async ({ query, headers, set }) => {
-    const apiKey = headers['x-key']
-    const expectedKey = env.DOCTOR_SCHEDULE_API_KEY
-    if (apiKey !== expectedKey) {
-      set.status = 401
-      return fail('Unauthorized', 401)
-    }
-
+  .get('/jadwal-dokter', async ({ query }) => {
     const { kd_dokter, kd_poli, hari } = query as Record<string, string | undefined>
 
     let sql = `
@@ -39,14 +36,9 @@ export const doctorRoutes = new Elysia({ prefix: '/api' })
 
     try {
       const rows = await db.query<any>(sql, params)
-      return {
-        metaData: { status: 'success', kode: 200, message: 'Berhasil' },
-        response: rows,
-      }
-    } catch {
-      return {
-        metaData: { status: 'success', kode: 200, message: 'Data jadwal belum tersedia' },
-        response: [],
-      }
+      return ok(rows)
+    } catch (e) {
+      console.error('[doctor] jadwal-dokter query failed:', e)
+      return ok([])
     }
   })

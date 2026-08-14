@@ -55,7 +55,6 @@ MAIL_USERNAME=<smtp user>
 MAIL_PASSWORD=<smtp pass>
 MAIL_FROM_ADDRESS=no-reply@<domain-anda>
 MAIL_FROM_NAME=RSUD
-DOCTOR_SCHEDULE_API_KEY=<ganti-key>
 ```
 
 Jangan commit `.env`.
