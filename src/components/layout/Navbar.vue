@@ -68,7 +68,7 @@ onUnmounted(() => {
     <div class="desktop-inner">
       <div class="desktop-brand" @click="navigateTo('/')" style="cursor:pointer">
         <img :src="hospitallLogo" class="desktop-logo" alt="Logo" />
-        <div><p class="desktop-brand-name">{{ hospitalName }}</p><p class="desktop-brand-sub">Sistem Pelayanan Kesehatan</p></div>
+        <div><p class="desktop-brand-name">{{ hospitalName }}</p><p class="desktop-brand-sub">SIBANG</p></div>
       </div>
       <nav class="desktop-nav">
         <button v-for="item in desktopNavItems" :key="item.to||item.label" :class="['desktop-nav-item',{active:isActiveItem(item),disabled:item.disabled}]" :disabled="item.disabled" @click="navigateItem(item)">

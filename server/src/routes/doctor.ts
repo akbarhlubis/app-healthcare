@@ -1,11 +1,12 @@
 import { Elysia } from 'elysia'
 import { db } from '../db'
 import { ok, fail } from '../middleware/auth'
+import { env } from '../config/env'
 
 export const doctorRoutes = new Elysia({ prefix: '/api' })
   .get('/jadwal-dokter', async ({ query, headers, set }) => {
     const apiKey = headers['x-key']
-    const expectedKey = Bun.env.DOCTOR_SCHEDULE_API_KEY || 'majumundurok'
+    const expectedKey = env.DOCTOR_SCHEDULE_API_KEY
     if (apiKey !== expectedKey) {
       set.status = 401
       return fail('Unauthorized', 401)
@@ -22,7 +23,7 @@ export const doctorRoutes = new Elysia({ prefix: '/api' })
         j.hari_kerja,
         j.jam_mulai,
         j.jam_selesai,
-        j.kapasitas
+        j.kuota
       FROM jadwal j
       JOIN dokter d ON d.kd_dokter = j.kd_dokter
       JOIN poliklinik p ON p.kd_poli = j.kd_poli

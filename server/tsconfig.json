@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["bun-types"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"]
 }

@@ -128,15 +128,15 @@ const serviceMenu = [
     action: navigateToSurvey,
     disabled: () => !surveyPath.value
   },
-  {
-    label: 'Daftar Umum',
-    icon: 'pi pi-user-plus',
-    color: '#06B6D4',
-    bgColor: '#ECFEFF',
-    darkBgColor: '#164E63',
-    category: 'pendaftaran',
-    action: () => router.push('/daftar-pasien')
-  },
+  // {
+  //   label: 'Daftar Umum',
+  //   icon: 'pi pi-user-plus',
+  //   color: '#06B6D4',
+  //   bgColor: '#ECFEFF',
+  //   darkBgColor: '#164E63',
+  //   category: 'pendaftaran',
+  //   action: () => router.push('/daftar-pasien')
+  // },
   {
     label: 'Daftar BPJS',
     icon: 'pi pi-id-card',
@@ -164,15 +164,15 @@ const serviceMenu = [
     category: 'informasi',
     action: () => window.open(`tel:${hospitalPhone}`)
   },
-  {
-    label: 'Konsultasi',
-    icon: 'pi pi-comments',
-    color: '#EC4899',
-    bgColor: '#FDF2F8',
-    darkBgColor: '#4A1D3A',
-    category: 'pelayanan',
-    action: () => router.push('/jadwal-dokter')
-  },
+  // {
+  //   label: 'Konsultasi',
+  //   icon: 'pi pi-comments',
+  //   color: '#EC4899',
+  //   bgColor: '#FDF2F8',
+  //   darkBgColor: '#4A1D3A',
+  //   category: 'pelayanan',
+  //   action: () => router.push('/jadwal-dokter')
+  // },
   {
     label: 'Alamat & Peta',
     icon: 'pi pi-map-marker',

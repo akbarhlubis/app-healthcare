@@ -2,12 +2,15 @@ import { Elysia, t } from 'elysia'
 import { db } from '../db'
 import { ok, fail, generateToken } from '../middleware/auth'
 import { createTransport } from 'nodemailer'
+import { env } from '../config/env'
+import { hashPassword, verifyPassword } from '../lib/password'
+import { clientIp } from '../lib/ip'
 
 const mailer = createTransport({
-  host: Bun.env.MAIL_HOST || 'smtp-relay.brevo.com',
-  port: Number(Bun.env.MAIL_PORT) || 587,
+  host: env.MAIL_HOST,
+  port: env.MAIL_PORT,
   secure: false,
-  auth: { user: Bun.env.MAIL_USERNAME || '', pass: Bun.env.MAIL_PASSWORD || '' },
+  auth: { user: env.MAIL_USERNAME, pass: env.MAIL_PASSWORD },
 })
 
 export const authRoutes = new Elysia({ prefix: '/v1/portal' })
@@ -16,10 +19,8 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
   // Laravel: checks no_ktp + tgl_lahir against pasien table, raw token
   .post(
     '/login',
-    async ({ body, set }) => {
+    async ({ body, set, request }) => {
       const { no_ktp, tgl_lahir, password } = body
-
-      // 1. Find patient by NIK + tgl_lahir
       const pasien = await db.first<any>(
         'SELECT no_rkm_medis, nm_pasien FROM pasien WHERE no_ktp = ? AND tgl_lahir = ?',
         [no_ktp, tgl_lahir]
@@ -40,7 +41,7 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
       }
 
       // 3. Verify password
-      const valid = await Bun.password.verify(password, user.password)
+      const valid = await verifyPassword(password, user.password)
       if (!valid) {
         set.status = 201
         return fail('NIK atau password salah', 201)
@@ -50,7 +51,7 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
       const token = generateToken(60)
       await db.execute(
         'INSERT INTO uxui_portal_tokens (user_id, token, device_name, ip_address, last_used_at, created_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
-        [user.id, token, 'Portal Web', '127.0.0.1']
+        [user.id, token, 'Portal Web', clientIp(request)]
       )
 
       return ok({
@@ -119,7 +120,7 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
       }
 
       // 4. Create portal user
-      const hashed = await Bun.password.hash(password, { algorithm: 'bcrypt' })
+      const hashed = await hashPassword(password)
       await db.execute(
         'INSERT INTO uxui_portal_users (no_rkm_medis, email, password, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())',
         [pasien.no_rkm_medis, email || null, hashed]
@@ -160,7 +161,7 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
 
       // Laravel: hash the reset token with bcrypt
       const plainToken = generateToken(64)
-      const hashedToken = await Bun.password.hash(plainToken, { algorithm: 'bcrypt' })
+      const hashedToken = await hashPassword(plainToken)
 
       await db.execute('DELETE FROM uxui_portal_password_resets WHERE email = ?', [email])
       await db.execute(
@@ -168,21 +169,22 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
         [email, hashedToken]
       )
 
-      const frontendUrl = Bun.env.FRONTEND_URL || 'http://localhost:5173'
+      const frontendUrl = env.FRONTEND_URL
       const resetLink = `${frontendUrl}/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(plainToken)}`
 
       try {
         await mailer.sendMail({
-          from: `"${Bun.env.MAIL_FROM_NAME || 'RSUD'}" <${Bun.env.MAIL_FROM_ADDRESS || ''}>`,
+          from: `"${env.MAIL_FROM_NAME}" <${env.MAIL_FROM_ADDRESS}>`,
           to: email,
           subject: 'Reset Password - Portal RSUD',
           html: `<p>Klik link berikut untuk mereset password Anda:</p><a href="${resetLink}">${resetLink}</a><p>Link berlaku selama 1 jam.</p>`,
         })
       } catch (e) {
+        // SMTP failure: never reveal whether the address is registered —
+        // return the same generic message as Laravel and log server-side.
         await db.execute('DELETE FROM uxui_portal_password_resets WHERE email = ?', [email])
-        console.error('Failed to send email:', e)
-        set.status = 201
-        return fail('Gagal mengirim email, silakan coba kembali', 201)
+        console.error('Failed to send reset email:', e)
+        return ok(null, defaultMsg)
       }
 
       return ok(null, defaultMsg)
@@ -229,14 +231,14 @@ export const authRoutes = new Elysia({ prefix: '/v1/portal' })
       }
 
       // Verify token (bcrypt hash compare)
-      const valid = await Bun.password.verify(token, reset.token)
+      const valid = await verifyPassword(token, reset.token)
       if (!valid) {
         set.status = 201
         return fail('Token tidak valid', 201)
       }
 
       // Update password
-      const hashed = await Bun.password.hash(password, { algorithm: 'bcrypt' })
+      const hashed = await hashPassword(password)
       await db.execute('UPDATE uxui_portal_users SET password = ? WHERE email = ?', [hashed, email])
       await db.execute('DELETE FROM uxui_portal_password_resets WHERE email = ?', [email])
 

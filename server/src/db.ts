@@ -1,11 +1,13 @@
 import mysql2 from 'mysql2/promise'
+import { env } from './config/env'
 
 const pool = mysql2.createPool({
-  host: Bun.env.DB_HOST || '127.0.0.1',
-  port: Number(Bun.env.DB_PORT) || 3306,
-  database: Bun.env.DB_DATABASE || 'sik',
-  user: Bun.env.DB_USERNAME || 'root',
-  password: Bun.env.DB_PASSWORD || '',
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  database: env.DB_DATABASE,
+  user: env.DB_USERNAME,
+  password: env.DB_PASSWORD,
+  // latin1 preserved — required by the legacy SIMRS `sik` database
   charset: 'latin1',
   dateStrings: true,
   waitForConnections: true,

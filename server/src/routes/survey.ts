@@ -68,6 +68,24 @@ export const surveyRoutes = new Elysia({ prefix: '/v1/portal' })
         if (user) noRkmMedis = user.no_rkm_medis
       }
 
+      // Match Laravel: if not logged in, must provide nama_anonim
+      if (!noRkmMedis && !nip && !body.nama_anonim) {
+        set.status = 201
+        return fail('Silakan login terlebih dahulu atau isi nama Anda', 201)
+      }
+
+      // Check required questions answered (match Laravel)
+      const requiredQuestions = await db.query<any>(
+        'SELECT id, question_text FROM uxui_portal_form_questions WHERE form_id = ? AND is_required = 1',
+        [form.id]
+      )
+      const submittedIds = body.answers.map((a: any) => a.form_question_id)
+      const missing = requiredQuestions.filter((q: any) => !submittedIds.includes(q.id))
+      if (missing.length > 0) {
+        set.status = 201
+        return fail('Beberapa pertanyaan wajib belum dijawab: ' + missing.map((m: any) => m.question_text).join(', '), 201)
+      }
+
       // Insert response
       const result = await db.execute(
         'INSERT INTO uxui_portal_form_responses (form_id, nip, no_rkm_medis, nama_anonim, submitted_at, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW(), NOW())',
