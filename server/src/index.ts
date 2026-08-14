@@ -1,8 +1,9 @@
-import { Elysia, ValidationError } from 'elysia'
+import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { node } from '@elysia/node'
 import { env } from './config/env'
 import { clientIp } from './lib/ip'
+import { pool } from './db'
 import { authRoutes } from './routes/auth'
 import { profileRoutes } from './routes/profile'
 import { surveyRoutes } from './routes/survey'
@@ -60,22 +61,25 @@ function securityHeaders(app: Elysia) {
 }
 
 // ===== Consistent error format (frontend reads metaData.status) =====
+// Uses Elysia's built-in error codes: PARSE/VALIDATION → 400, NOT_FOUND → 404,
+// anything else → 500 (logged, never leaked to the client).
 function errorHandler(app: Elysia) {
-  return app.onError(({ error, set }) => {
-    // Elysia wraps bad JSON body in its own error — match on message as well
-    const isBadInput =
-      error instanceof ValidationError ||
-      (error as any)?.status === 400 ||
-      /ParseError|Bad Request|JSON|Unexpected token/i.test(error.message)
-    if (isBadInput) {
+  return app.onError(({ code, error, set }) => {
+    if (code === 'VALIDATION' || code === 'PARSE') {
       set.status = 400
       return {
         metaData: { status: 'error', kode: 400, message: 'Data yang dikirim tidak valid' },
         response: null,
       }
     }
-    console.error('[error]', error)
-    if (error instanceof Error) console.error('[error] message:', error.message)
+    if (code === 'NOT_FOUND') {
+      set.status = 404
+      return {
+        metaData: { status: 'error', kode: 404, message: 'Route tidak ditemukan' },
+        response: null,
+      }
+    }
+    console.error(`[error:${code}]`, error)
     set.status = 500
     return {
       metaData: { status: 'error', kode: 500, message: 'Terjadi kesalahan pada server' },
@@ -118,3 +122,13 @@ const app = new Elysia({ adapter: node() })
 
 console.log(`🚀 Elysia server running at http://${env.HOST}:${env.PORT}`)
 console.log(`   Health: http://${env.HOST}:${env.PORT}/api/health`)
+
+// ===== Graceful shutdown (aaPanel sends SIGTERM on stop/restart) =====
+async function shutdown(signal: string) {
+  console.log(`[server] ${signal} received, shutting down...`)
+  await pool.end()
+  app.stop()
+  process.exit(0)
+}
+process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM', () => shutdown('SIGTERM'))

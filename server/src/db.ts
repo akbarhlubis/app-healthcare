@@ -1,7 +1,7 @@
 import mysql2 from 'mysql2/promise'
 import { env } from './config/env'
 
-const pool = mysql2.createPool({
+export const pool = mysql2.createPool({
   host: env.DB_HOST,
   port: env.DB_PORT,
   database: env.DB_DATABASE,
